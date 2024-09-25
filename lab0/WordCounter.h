@@ -2,20 +2,25 @@
 #define WORDCOUNTER_H
 
 #include <string>
-#include <map>
 #include <list>
+#include <map>
+
 
 class WordCounter {
+public:
+    WordCounter();
+
+    void processText(const std::list<std::string>& lines);
+
+    std::list<std::pair<std::string, int>> getSortedWords() const;
+
+    int getTotalWords() const;
+
 private:
     std::map<std::string, int> wordCount;
-    std::list<std::pair<std::string, int>> sortedWords;
+    int totalWords;
 
-    void splitIntoWords(const std::string& line, std::list<std::string>& words);
-
-public:
-    WordCounter(const std::string& inputFile);
-    void sortWordsByFrequency();
-    void saveToCSV(const std::string& outputFile) const;
+    std::list<std::string> splitIntoWords(const std::string& line) const;
 };
 
 #endif
