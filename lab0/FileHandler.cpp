@@ -1,4 +1,5 @@
 #include "FileHandler.h"
+#include "WordCounter.h"
 #include <fstream>
 #include <iostream>
 
@@ -6,28 +7,27 @@
 FileHandler::FileHandler(const std::string& inputFile, const std::string& outputFile)
         : inputFile(inputFile), outputFile(outputFile) {}
 
-std::list<std::string> FileHandler::readLines() const {
-    std::ifstream inFile(inputFile);
-    std::list<std::string> lines;
-    std::string line;
 
+bool FileHandler::readLines(WordCounter& wordCounter) const {
+    std::ifstream inFile(inputFile);
     if (!inFile) {
         std::cerr << "Error opening input file.\n";
-        return lines;
+        return false;
     }
 
+    std::string line;
     while (std::getline(inFile, line)) {
-        lines.push_back(line);
+        wordCounter.processText(line);
     }
-
-    return lines;
+    return true;
 }
 
-void FileHandler::saveToCSV(const std::list<std::pair<std::string, int>>& sortedWords, int totalWords) const {
+
+bool FileHandler::saveToCSV(const std::list<std::pair<std::string, int>>& sortedWords, int totalWords) const {
     std::ofstream outFile(outputFile);
     if (!outFile) {
         std::cerr << "Error opening output file.\n";
-        return;
+        return false;
     }
 
     outFile << "Word,Frequency,Frequency (%)\n";
@@ -36,4 +36,6 @@ void FileHandler::saveToCSV(const std::list<std::pair<std::string, int>>& sorted
         double frequencyPercentage = (double)(count) / totalWords * 100.0;
         outFile << word << ',' << count << ',' << frequencyPercentage << '\n';
     }
+    return true;
 }
+

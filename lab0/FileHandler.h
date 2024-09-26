@@ -1,17 +1,18 @@
 #ifndef FILEHANDLER_H
 #define FILEHANDLER_H
-
+#include "WordCounter.h"
 #include <string>
 #include <list>
+
 
 
 class FileHandler {
 public:
     FileHandler(const std::string& inputFile, const std::string& outputFile);
 
-    std::list<std::string> readLines() const;
+    bool readLines(WordCounter& wordCounter) const;
 
-    void saveToCSV(const std::list<std::pair<std::string, int>>& sortedWords, int totalWords) const;
+    bool saveToCSV(const std::list<std::pair<std::string, int>>& sortedWords, int totalWords) const;
 
 private:
     std::string inputFile;
@@ -19,4 +20,5 @@ private:
 };
 
 #endif
+
 

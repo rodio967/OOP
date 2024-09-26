@@ -8,9 +8,7 @@
 
 class WordCounter {
 public:
-    WordCounter();
-
-    void processText(const std::list<std::string>& lines);
+    void processText(const std::string& line);
 
     std::list<std::pair<std::string, int>> getSortedWords() const;
 
@@ -18,9 +16,10 @@ public:
 
 private:
     std::map<std::string, int> wordCount;
-    int totalWords;
+    int totalWords{0};
 
     std::list<std::string> splitIntoWords(const std::string& line) const;
 };
 
 #endif
+

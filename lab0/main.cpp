@@ -12,22 +12,21 @@ int main(int argc, char* argv[]) {
     std::string outputFile = argv[2];
 
     FileHandler fileHandler(inputFile, outputFile);
-
-    std::list<std::string> lines = fileHandler.readLines();
-
-    if (lines.empty()) {
-        std::cerr << "No lines to process.\n";
-        return 1;
-    }
-
     WordCounter wordCounter;
 
-    wordCounter.processText(lines);
+    if (!fileHandler.readLines(wordCounter)) {
+        std::cout << "Error readLines";
+        return 2;
+    }
 
     auto sortedWords = wordCounter.getSortedWords();
 
-    fileHandler.saveToCSV(sortedWords, wordCounter.getTotalWords());
+    if(!fileHandler.saveToCSV(sortedWords, wordCounter.getTotalWords())) {
+        std::cout << "Error write to CSV";
+        return 3;
+    }
 
     std::cout << "Processing completed.\n";
     return 0;
 }
+
