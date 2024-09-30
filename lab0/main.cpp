@@ -13,9 +13,16 @@ int main(int argc, char* argv[]) {
 
     FileHandler fileHandler(inputFile, outputFile);
     WordCounter wordCounter;
+    std::string line;
+    bool Error_readtext = false;
 
-    if (!fileHandler.readLines(wordCounter)) {
-        std::cout << "Error readLines";
+
+    while (fileHandler.readLines(line,Error_readtext)){
+        wordCounter.processText(line);
+    }
+
+    if (Error_readtext){
+        std::cerr << "Error readLines" << std::endl;
         return 2;
     }
 

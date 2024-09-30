@@ -1,5 +1,4 @@
 #include "FileHandler.h"
-#include "WordCounter.h"
 #include <fstream>
 #include <iostream>
 
@@ -8,18 +7,16 @@ FileHandler::FileHandler(const std::string& inputFile, const std::string& output
         : inputFile(inputFile), outputFile(outputFile) {}
 
 
-bool FileHandler::readLines(WordCounter& wordCounter) const {
+bool FileHandler::readLines(std::string& line,bool& error){
     std::ifstream inFile(inputFile);
     if (!inFile) {
         std::cerr << "Error opening input file.\n";
+        error = true;
         return false;
     }
 
-    std::string line;
-    while (std::getline(inFile, line)) {
-        wordCounter.processText(line);
-    }
-    return true;
+    const auto& new_string = getline(inFile,line);
+    return new_string ? true : false;
 }
 
 
