@@ -1,6 +1,7 @@
 #include "FileHandler.h"
 #include "WordCounter.h"
 #include <iostream>
+#include <string>
 
 int main(int argc, char* argv[]) {
     if (argc != 3) {
@@ -8,30 +9,35 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::string inputFile = argv[1];
-    std::string outputFile = argv[2];
+    FileHandler fileHandler;
+    if (!fileHandler.openInfile(argv[1])) {
+        std::cerr << "Error can't open file " << argv[1] << std::endl;
+        return 2;
+    }
 
-    FileHandler fileHandler(inputFile, outputFile);
+
     WordCounter wordCounter;
     std::string line;
     bool Error_readtext = false;
 
 
-    while (fileHandler.readLines(line,Error_readtext)){
+    while (fileHandler.readLines(line,Error_readtext)) {
         wordCounter.processText(line);
     }
 
-    if (Error_readtext){
+    if (Error_readtext) {
         std::cerr << "Error readLines" << std::endl;
-        return 2;
+        return 3;
     }
 
     auto sortedWords = wordCounter.getSortedWords();
 
-    if(!fileHandler.saveToCSV(sortedWords, wordCounter.getTotalWords())) {
-        std::cout << "Error write to CSV";
-        return 3;
+    if (!fileHandler.openOutfile(argv[2])) {
+        std::cerr << "Error can't open file " << argv[2] << std::endl;
+        return 4;
     }
+
+    fileHandler.saveToCSV(sortedWords, wordCounter.getTotalWords());
 
     std::cout << "Processing completed.\n";
     return 0;

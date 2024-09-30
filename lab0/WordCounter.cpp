@@ -1,5 +1,8 @@
 #include "WordCounter.h"
 #include <cctype>
+#include <string>
+#include <list>
+
 
 void WordCounter::processText(const std::string& line) {
     std::list<std::string> words = splitIntoWords(line);
