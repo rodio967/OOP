@@ -18,17 +18,11 @@ int main(int argc, char* argv[]) {
 
     WordCounter wordCounter;
     std::string line;
-    bool Error_readtext = false;
 
-
-    while (fileHandler.readLines(line,Error_readtext)) {
+    while (fileHandler.readLines(line)) {
         wordCounter.processText(line);
     }
 
-    if (Error_readtext) {
-        std::cerr << "Error readLines" << std::endl;
-        return 3;
-    }
 
     auto sortedWords = wordCounter.getSortedWords();
 

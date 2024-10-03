@@ -14,10 +14,10 @@ bool FileHandler::openOutfile(const std::string& file) {
     return outputFile.is_open();
 }
 
-bool FileHandler::readLines(std::string& line,bool& error) {
+bool FileHandler::readLines(std::string& line) {
     const auto& new_string = getline(inputFile,line);
     if (inputFile.bad()) {
-        error=true;
+        return false;
     }
     return new_string ? true : false;
 }
