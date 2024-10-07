@@ -33,6 +33,9 @@ int main(int argc, char* argv[]) {
 
     fileHandler.saveToCSV(sortedWords, wordCounter.getTotalWords());
 
+    fileHandler.closeInfile();
+    fileHandler.closeOutfile();
+
     std::cout << "Processing completed.\n";
     return 0;
 }

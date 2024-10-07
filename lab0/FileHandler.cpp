@@ -32,3 +32,15 @@ void FileHandler::saveToCSV(const std::list<std::pair<std::string, int>>& sorted
     }
 }
 
+void FileHandler::closeInfile() {
+    if (inputFile.is_open()) {
+        inputFile.close();
+    }
+}
+
+void FileHandler::closeOutfile() {
+    if (outputFile.is_open()) {
+        outputFile.close();
+    }
+}
+

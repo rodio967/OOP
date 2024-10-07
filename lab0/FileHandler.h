@@ -15,6 +15,9 @@ public:
 
     void saveToCSV(const std::list<std::pair<std::string, int>>& sortedWords, int totalWords);
 
+    void closeInfile();
+    void closeOutfile();
+
 private:
     std::ifstream inputFile{nullptr};
     std::ofstream outputFile{nullptr};
