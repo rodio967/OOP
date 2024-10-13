@@ -1,12 +1,20 @@
 #include "BitArray.h"
 #include <stdexcept>
-#include <sstream>
 #include <algorithm>
 
 const int BITS_PER_WORD = sizeof(unsigned long) * 8;
 
-inline int words_needed(int bits) {
+int words_needed(int bits) {
     return (bits + BITS_PER_WORD - 1) / BITS_PER_WORD;
+}
+
+static void clear_excess_bits(std::vector<unsigned long>& data, int num_bits) {
+    int excess_bits = words_needed(num_bits) * BITS_PER_WORD - num_bits;
+
+    if (excess_bits > 0 && !data.empty()) {
+        unsigned long mask = (~0UL) >> excess_bits;
+        data.back() &= mask;
+    }
 }
 
 BitArray::BitArray() : num_bits_(0) {}
@@ -44,23 +52,21 @@ void BitArray::resize(int num_bits, bool value) {
     if (num_bits < 0) {
         throw std::invalid_argument("Number of bits cannot be negative");
     }
-    int old_bits = num_bits_;
-    num_bits_ = num_bits;
-    int old_words = words_needed(old_bits);
+
+    int i = num_bits_;
+    int old_words = words_needed(num_bits_);
     int new_words = words_needed(num_bits);
+    num_bits_ = num_bits;
+
     data_.resize(new_words, 0);
 
     if (value) {
-        for (int i = old_bits; i < num_bits; ++i) {
+        for (int i; i < num_bits; ++i) {
             set(i, true);
         }
     }
 
-    int excess_bits = new_words * BITS_PER_WORD - num_bits;
-    if (excess_bits > 0 && new_words > 0) {
-        unsigned long mask = (~0UL) >> excess_bits;
-        data_[new_words - 1] &= mask;
-    }
+    clear_excess_bits(data_, num_bits);
 }
 
 void BitArray::clear() {
@@ -114,32 +120,15 @@ BitArray& BitArray::operator<<=(int n) {
         return *this;
     }
 
-    int word_shift = n / BITS_PER_WORD;
-    int bit_shift = n % BITS_PER_WORD;
-    long size = data_.size();
-
-    if (word_shift > 0) {
-        for (long i = size - 1; i >= word_shift; --i) {
-            data_[i] = data_[i - word_shift];
-        }
-        for (long i = 0; i < word_shift; ++i) {
-            data_[i] = 0;
-        }
+    for (int i = num_bits_ - 1; i >= n; i--) {
+        set(i,(*this)[i - n]);
     }
 
-    if (bit_shift > 0) {
-        for (long i = size - 1; i >= word_shift; --i) {
-            unsigned long higher1 = (i > 0) ? data_[i-1] : 0;
-            data_[i] <<= bit_shift;
-            data_[i] |= (higher1 >> (BITS_PER_WORD - bit_shift));
-        }
+    for (int i = n - 1; i >= 0; i--) {
+        reset(i);
     }
 
-    int excess_bits = words_needed(num_bits_) * BITS_PER_WORD - num_bits_;
-    if (excess_bits > 0 && !data_.empty()) {
-        unsigned long mask = (~0UL) >> excess_bits;
-        data_.back() &= mask;
-    }
+    clear_excess_bits(data_, num_bits_);
 
     return *this;
 }
@@ -155,32 +144,15 @@ BitArray& BitArray::operator>>=(int n) {
         return *this;
     }
 
-    int word_shift = n / BITS_PER_WORD;
-    int bit_shift = n % BITS_PER_WORD;
-    unsigned long size = data_.size();
-
-    if (word_shift > 0) {
-        for (long i = 0; i < size - word_shift; ++i) {
-            data_[i] = data_[i + word_shift];
-        }
-        for (long i = size - word_shift; i < size; ++i) {
-            data_[i] = 0;
-        }
+    for (int i = 0; i + n < num_bits_; i++){
+        set(i,(*this)[i + n]);
     }
 
-    if (bit_shift > 0) {
-        for (long i = 0; i < size - word_shift; ++i) {
-            unsigned long lower = (i < size - 1) ? data_[i + 1] : 0;
-            data_[i] >>= bit_shift;
-            data_[i] |= (lower << (BITS_PER_WORD - bit_shift));
-        }
+    for (int i = num_bits_ - n; i < num_bits_; i++){
+        reset(i);
     }
 
-    int excess_bits = words_needed(num_bits_) * BITS_PER_WORD - num_bits_;
-    if (excess_bits > 0 && !data_.empty()) {
-        unsigned long mask = (~0UL) >> excess_bits;
-        data_.back() &= mask;
-    }
+    clear_excess_bits(data_, num_bits_);
 
     return *this;
 }
@@ -216,11 +188,7 @@ BitArray& BitArray::set() {
         data_[i] = ~0UL;
     }
 
-    int excess_bits = words_needed(num_bits_) * BITS_PER_WORD - num_bits_;
-    if (excess_bits > 0 && !data_.empty()) {
-        unsigned long mask = (~0UL) >> excess_bits;
-        data_.back() &= mask;
-    }
+    clear_excess_bits(data_, num_bits_);
     return *this;
 }
 
@@ -254,11 +222,8 @@ BitArray BitArray::operator~() const {
         word = ~word;
     }
 
-    int excess_bits = words_needed(num_bits_) * BITS_PER_WORD - num_bits_;
-    if (excess_bits > 0 && !result.data_.empty()) {
-        unsigned long mask = (~0UL) >> excess_bits;
-        result.data_.back() &= mask;
-    }
+
+    clear_excess_bits(result.data_, num_bits_);
     return result;
 }
 
