@@ -2,20 +2,6 @@
 #include <stdexcept>
 #include <algorithm>
 
-const int BITS_PER_WORD = sizeof(unsigned long) * 8;
-
-int words_needed(int bits) {
-    return (bits + BITS_PER_WORD - 1) / BITS_PER_WORD;
-}
-
-static void clear_excess_bits(std::vector<unsigned long>& data, int num_bits) {
-    int excess_bits = words_needed(num_bits) * BITS_PER_WORD - num_bits;
-
-    if (excess_bits > 0 && !data.empty()) {
-        unsigned long mask = (~0UL) >> excess_bits;
-        data.back() &= mask;
-    }
-}
 
 BitArray::BitArray() : num_bits_(0) {}
 
@@ -53,20 +39,19 @@ void BitArray::resize(int num_bits, bool value) {
         throw std::invalid_argument("Number of bits cannot be negative");
     }
 
-    int i = num_bits_;
-    int old_words = words_needed(num_bits_);
-    int new_words = words_needed(num_bits);
-    num_bits_ = num_bits;
 
+    int new_words = words_needed(num_bits);
     data_.resize(new_words, 0);
 
     if (value) {
-        for (int i; i < num_bits; ++i) {
-            set(i, true);
+        for (int i = num_bits_; i < num_bits; ++i) {
+            int word = i / BITS_PER_WORD;
+            int bit = i % BITS_PER_WORD;
+            data_[word] |= (1UL << bit);
         }
     }
 
-    clear_excess_bits(data_, num_bits);
+    num_bits_ = num_bits;
 }
 
 void BitArray::clear() {
@@ -128,7 +113,7 @@ BitArray& BitArray::operator<<=(int n) {
         reset(i);
     }
 
-    clear_excess_bits(data_, num_bits_);
+    clear_excess_bits(num_bits_);
 
     return *this;
 }
@@ -152,7 +137,7 @@ BitArray& BitArray::operator>>=(int n) {
         reset(i);
     }
 
-    clear_excess_bits(data_, num_bits_);
+    clear_excess_bits(num_bits_);
 
     return *this;
 }
@@ -188,7 +173,7 @@ BitArray& BitArray::set() {
         data_[i] = ~0UL;
     }
 
-    clear_excess_bits(data_, num_bits_);
+    clear_excess_bits(num_bits_);
     return *this;
 }
 
@@ -222,8 +207,12 @@ BitArray BitArray::operator~() const {
         word = ~word;
     }
 
+    int excess_bits = words_needed(num_bits_) * BITS_PER_WORD - num_bits_;
+    if (excess_bits > 0 && !result.data_.empty()) {
+        unsigned long mask = (~0UL) >> excess_bits;
+        result.data_.back() &= mask;
+    }
 
-    clear_excess_bits(result.data_, num_bits_);
     return result;
 }
 

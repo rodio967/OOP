@@ -253,6 +253,20 @@ private:
     std::vector<unsigned long> data_; ///< Internal storage for bits.
     int num_bits_; ///< Number of bits in the BitArray.
 
+    const int BITS_PER_WORD = sizeof(unsigned long) * 8;
+
+    int words_needed(int bits) const{
+        return (bits + BITS_PER_WORD - 1) / BITS_PER_WORD;
+    }
+
+    void clear_excess_bits(int num_bits) {
+        int excess_bits = words_needed(num_bits) * BITS_PER_WORD - num_bits;
+        if (excess_bits > 0 && !data_.empty()) {
+            unsigned long mask = (~0UL) >> excess_bits;
+            data_.back() &= mask;
+        }
+    }
+
     void ensure_capacity(int bit);
 };
 
