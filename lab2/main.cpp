@@ -1,11 +1,19 @@
 #include <QApplication>
+#include "snakemodel.h"
+#include "snakecontroller.h"
 #include "mainwindow.h"
 
-int main(int argc, char *argv[]) {
-    QApplication app(argc, argv);
+#include <QApplication>
 
-    MainWindow window;
-    window.show();
+int main(int argc, char *argv[])
+{
+    QApplication a(argc, argv);
 
-    return app.exec();
+    SnakeModel model;
+    SnakeController controller(&model);
+
+    MainWindow view(&model, &controller);
+    view.show();
+
+    return a.exec();
 }

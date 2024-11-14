@@ -1,12 +1,11 @@
-#ifndef FOOD_H
-#define FOOD_H
-
+#ifndef TELEPORT_H
+#define TELEPORT_H
 
 #include "GameObject.h"
 
-class Food : public GameObject {
+class Teleport : public GameObject {
 public:
-    Food();
+    Teleport();
     QPoint getPosition() const override;
     void setPosition(const QPoint& pos) override;
 

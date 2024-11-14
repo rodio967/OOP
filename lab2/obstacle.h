@@ -1,12 +1,13 @@
-#ifndef FOOD_H
-#define FOOD_H
+#ifndef OBSTACLE_H
+#define OBSTACLE_H
+
 
 
 #include "GameObject.h"
 
-class Food : public GameObject {
+class Obstacle : public GameObject {
 public:
-    Food();
+    Obstacle();
     QPoint getPosition() const override;
     void setPosition(const QPoint& pos) override;
 

@@ -1,24 +1,31 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QStackedWidget>
-#include <QWidget>
-#include "startmenu.h"
-#include "snakegame.h"
+#include <QMainWindow>
 
-class MainWindow : public QStackedWidget {
+#include <QWidget>
+#include <QPushButton>
+#include "snakemodel.h"
+#include "snakecontroller.h"
+
+class MainWindow : public QWidget {
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
+    explicit MainWindow(SnakeModel *model, SnakeController *controller, QWidget *parent = nullptr);
+
+public slots:
+    void updateView();
+    void restartGame();
+
+protected:
+    void paintEvent(QPaintEvent *event) override;
 
 private:
-    StartMenu *startMenu;
-    SnakeGame *snakeGame;
+    SnakeModel *model;
+    SnakeController *controller;
 
-private slots:
-    void showGame();
+    QPushButton *restartButton;
+
 };
-
 #endif

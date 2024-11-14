@@ -12,16 +12,22 @@ SOURCES += \
     food.cpp \
     main.cpp \
     mainwindow.cpp \
-    snake_obj.cpp \
-    snakegame.cpp \
-    startmenu.cpp
+    obstacle.cpp \
+    poisonedapple.cpp \
+    snakecontroller.cpp \
+    snakemodel.cpp \
+    teleport.cpp
 
 HEADERS += \
+    GameObject.h \
+    GameObjectFactory.h \
     food.h \
     mainwindow.h \
-    snake_obj.h \
-    snakegame.h \
-    startmenu.h
+    obstacle.h \
+    poisonedapple.h \
+    snakecontroller.h \
+    snakemodel.h \
+    teleport.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
