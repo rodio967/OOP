@@ -11,6 +11,12 @@ SnakeModel::SnakeModel(QObject *parent) : QObject(parent) {
     factory.Register("Obstacle", CreateObstacle);
     factory.Register("Teleport", CreateTeleport);
     factory.Register("PoisonedApple", CreatePoisonedApple);
+    objectSettings = {
+        {"Obstacle", {3, 20}},
+        {"Teleport", {2, 20}},
+        {"Food", {1, 20}},
+        {"PoisonedApple", {1, 20}}
+    };
 
     initGame();
 
@@ -30,13 +36,6 @@ void SnakeModel::initGame()
     snake.clear();
     gameObjects.clear();
     snake.push_back(QPoint(0, 0));
-
-    std::unordered_map<std::string, Settings> objectSettings = {
-        {"Obstacle", {3, QRect(0, 0, 400, 400)}},
-        {"Teleport", {2, QRect(0, 0, 400, 400)}},
-        {"Food", {1, QRect(0, 0, 400, 400)}},
-        {"PoisonedApple", {1, QRect(0, 0, 400, 400)}}
-    };
 
     placeObjects(objectSettings);
 }
@@ -61,15 +60,14 @@ void SnakeModel::changeDirection(Direction newDirection)
 
 void SnakeModel::placeObjects(const std::unordered_map<std::string, Settings> &objectSettings)
 {
-    int maxPos = 400 / blockSize;
     for (const auto& [type, settings] : objectSettings) {
         for (int i = 0; i < settings.count; ++i) {
             auto object = factory.CreateObject(type);
             QPoint position;
 
             do {
-                position.setX(QRandomGenerator::global()->bounded(maxPos));
-                position.setY(QRandomGenerator::global()->bounded(maxPos));
+                position.setX(QRandomGenerator::global()->bounded(settings.maxPosition));
+                position.setY(QRandomGenerator::global()->bounded(settings.maxPosition));
             } while (isPositionOccupied(position));
 
             object->setPosition(position);

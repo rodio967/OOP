@@ -18,7 +18,7 @@
 
 struct Settings {
     int count;
-    QRect bounds;
+    int maxPosition;
 };
 
 class SnakeModel : public QObject {
@@ -77,6 +77,8 @@ private:
     QVector<QPoint> snake;
 
     GameObjectFactory factory;
+
+    std::unordered_map<std::string, Settings> objectSettings;
 
 
     std::vector<std::unique_ptr<GameObject>> gameObjects;
