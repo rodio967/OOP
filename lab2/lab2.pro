@@ -9,6 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    GameObjectFactory.cpp \
     food.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -19,8 +20,10 @@ SOURCES += \
     teleport.cpp
 
 HEADERS += \
+    CollisionVisitor.h \
     GameObject.h \
     GameObjectFactory.h \
+    GameObjectVisitor.h \
     food.h \
     mainwindow.h \
     obstacle.h \

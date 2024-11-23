@@ -7,8 +7,19 @@
 #include <QVector>
 #include <QRandomGenerator>
 #include <QPushButton>
+#include <string>
+#include <unordered_map>
 
+
+#include "GameObject.h"
 #include "GameObjectFactory.h"
+#include "GameObjectVisitor.h"
+
+
+struct Settings {
+    int count;
+    QRect bounds;
+};
 
 class SnakeModel : public QObject {
     Q_OBJECT
@@ -21,24 +32,32 @@ public:
     void StartGame();
     void changeDirection(Direction newDirection);
 
+    void placeObjects(const std::unordered_map<std::string, Settings>& objectSettings);
+
     void checkCollision();
+    bool isPositionOccupied(const QPoint& position);
     void placeFood();
-    void placeObstacles();
     void placePoisoned_Apple();
     void placeTeleport();
     void growSnake();
     void decrease();
+    void oneMove();
+    void addScore();
+    void checkBounds();
+    void onUpDirection(Direction newDir);
+    void onDownDirection(Direction newDir);
+    void onLeftDirection(Direction newDir);
+    void onRightDirection(Direction newDir);
     void SetGameStatus();
+    void setSnakeHeadPosition(const QPoint& pos);
+    std::vector<std::unique_ptr<GameObject>>& getGameObjects();
 
     QVector<QPoint> getSnake();
-    const std::vector<std::unique_ptr<GameObject>>& getObstacles() const;
-    QPoint getFood();
-    QPoint getPoisoned_Apple();
-    QPoint getTeleport1();
-    QPoint getTeleport2();
+
     QTimer* getTimer();
 
     bool isGameOver();
+    void setGameOver();
     int getScore();
 
 
@@ -50,17 +69,18 @@ signals:
     void modelUpdated();
 
 private:
+
     Direction dir;
 
     QTimer *timer;
 
     QVector<QPoint> snake;
-    std::vector<std::unique_ptr<GameObject>> obstacles;
 
-    std::unique_ptr<GameObject> food;
-    std::unique_ptr<GameObject> poisoned_apple;
-    std::unique_ptr<GameObject> teleport1;
-    std::unique_ptr<GameObject> teleport2;
+    GameObjectFactory factory;
+
+
+    std::vector<std::unique_ptr<GameObject>> gameObjects;
+
 
     int blockSize;
     int score;
@@ -68,4 +88,4 @@ private:
     bool isPause;
 };
 
-#endif
+#endif // SNAKEMODEL_H

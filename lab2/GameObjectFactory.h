@@ -1,32 +1,27 @@
 #ifndef GAMEOBJECTFACTORY_H
 #define GAMEOBJECTFACTORY_H
 
-
-#include "Food.h"
-#include "Obstacle.h"
-#include "Teleport.h"
-#include "PoisonedApple.h"
 #include <memory>
+#include <map>
+#include <string>
+#include "GameObject.h"
 
 class GameObjectFactory {
 public:
-    enum ObjectType { FOOD, OBSTACLE, TELEPORT, POISONEDAPPLE };
+    using CreatorFunction = std::unique_ptr<GameObject>(*)();
 
-    static std::unique_ptr<GameObject> createObject(ObjectType type) {
-        switch (type) {
-        case FOOD:
-            return std::make_unique<Food>();
-        case OBSTACLE:
-            return std::make_unique<Obstacle>();
-        case TELEPORT:
-            return std::make_unique<Teleport>();
-        case POISONEDAPPLE:
-            return std::make_unique<PoisonedApple>();
-        default:
-            return nullptr;
-        }
-    }
+    bool Register(const std::string& id, CreatorFunction creator);
+    bool Unregister(const std::string& id);
+    std::unique_ptr<GameObject> CreateObject(const std::string& id);
+
+private:
+    std::map<std::string, CreatorFunction> associations_;
 };
 
 
-#endif
+std::unique_ptr<GameObject> CreateFood();
+std::unique_ptr<GameObject> CreateObstacle();
+std::unique_ptr<GameObject> CreateTeleport();
+std::unique_ptr<GameObject> CreatePoisonedApple();
+
+#endif // GAMEOBJECTFACTORY_H

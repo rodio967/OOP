@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include <QPainter>
-
+#include "Food.h"
+#include "PoisonedApple.h"
+#include "obstacle.h"
+#include "Teleport.h"
 
 
 MainWindow::MainWindow(SnakeModel *model, SnakeController *controller, QWidget *parent)
@@ -68,22 +71,20 @@ void MainWindow::paintEvent(QPaintEvent *event) {
         painter.drawRect(point.x() * 20, point.y() * 20, 20, 20);
     }
 
-    painter.setBrush(Qt::red);
-    QPoint food = model->getFood();
-    painter.drawRect(food.x() * 20, food.y() * 20, 20, 20);
+    for (const std::unique_ptr<GameObject>& obj : model->getGameObjects()) {
+        if (dynamic_cast<Food*>(obj.get())) {
+            painter.setBrush(Qt::red);
+        } else if (dynamic_cast<PoisonedApple*>(obj.get())) {
+            painter.setBrush(QBrush(QColor(0, 255, 100)));
+        } else if (dynamic_cast<Obstacle*>(obj.get())) {
+            painter.setBrush(Qt::blue);
+        } else if (dynamic_cast<Teleport*>(obj.get())) {
+            painter.setBrush(Qt::yellow);
+        }
 
-    painter.setBrush(QBrush(QColor(0, 255, 100)));
-    QPoint poisoned_apple = model->getPoisoned_Apple();
-    painter.drawRect(poisoned_apple.x() * 20, poisoned_apple.y() * 20, 20, 20);
-
-    painter.setBrush(Qt::blue);
-    for (const std::unique_ptr<GameObject> &obstacle : model->getObstacles()) {
-        painter.drawRect(obstacle->getPosition().x() * 20, obstacle->getPosition().y() * 20, 20, 20);
+        QPoint pos = obj->getPosition();
+        painter.drawRect(pos.x() * 20, pos.y() * 20, 20, 20);
     }
-
-    painter.setBrush(Qt::yellow);
-    painter.drawRect(model->getTeleport1().x() * 20, model->getTeleport1().y() * 20, 20, 20);
-    painter.drawRect(model->getTeleport2().x() * 20, model->getTeleport2().y() * 20, 20, 20);
 
 
     QRect scoreRect(0, 400, 400, 40);
