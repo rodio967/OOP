@@ -36,9 +36,9 @@ public:
 
     void checkCollision();
     bool isPositionOccupied(const QPoint& position);
-    void placeFood();
+    void placeElem(const std::string& type, const int& index);
     void placePoisoned_Apple();
-    void placeTeleport();
+    void placeTeleport(const std::string& type, const int& index);
     void growSnake();
     void decrease();
     void oneMove();
@@ -49,6 +49,7 @@ public:
     void onLeftDirection(Direction newDir);
     void onRightDirection(Direction newDir);
     void SetGameStatus();
+    bool checkTeleports(int ind1, int ind2);
     void setSnakeHeadPosition(const QPoint& pos);
     std::vector<std::unique_ptr<GameObject>>& getGameObjects();
 

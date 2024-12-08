@@ -13,7 +13,7 @@ SnakeModel::SnakeModel(QObject *parent) : QObject(parent) {
     factory.Register("PoisonedApple", CreatePoisonedApple);
     objectSettings = {
         {"Obstacle", {3, 20}},
-        {"Teleport", {2, 20}},
+        {"Teleport", {4, 20}},
         {"Food", {1, 20}},
         {"PoisonedApple", {1, 20}}
     };
@@ -71,6 +71,7 @@ void SnakeModel::placeObjects(const std::unordered_map<std::string, Settings> &o
             } while (isPositionOccupied(position));
 
             object->setPosition(position);
+            object->setIndex(i);
             gameObjects.push_back(std::move(object));
         }
     }
@@ -127,49 +128,29 @@ bool SnakeModel::isPositionOccupied(const QPoint &position)
     return false;
 }
 
-void SnakeModel::placeFood() {
+void SnakeModel::placeElem(const std::string& type, const int& index) {
     int maxPos = 400 / blockSize;
 
     for (auto& obj : gameObjects) {
-        if (auto food = dynamic_cast<Food*>(obj.get())) {
-
+        if (obj->getType() == type && obj->getIndex() == index) {
             QPoint foodPosition;
             do {
                 foodPosition.setX(QRandomGenerator::global()->bounded(maxPos));
                 foodPosition.setY(QRandomGenerator::global()->bounded(maxPos));
             } while (isPositionOccupied(foodPosition));
 
-            food->setPosition(foodPosition);
-            return;
+            obj->setPosition(foodPosition);
+
         }
     }
 }
 
-void SnakeModel::placePoisoned_Apple()
+void SnakeModel::placeTeleport(const std::string& type, const int& index)
 {
     int maxPos = 400 / blockSize;
 
     for (auto& obj : gameObjects) {
-        if (auto poisonedapple = dynamic_cast<PoisonedApple*>(obj.get())) {
-
-            QPoint poisonedPosition;
-            do {
-                poisonedPosition.setX(QRandomGenerator::global()->bounded(maxPos));
-                poisonedPosition.setY(QRandomGenerator::global()->bounded(maxPos));
-            } while (isPositionOccupied(poisonedPosition));
-
-            poisonedapple->setPosition(poisonedPosition);
-            return;
-        }
-    }
-}
-
-void SnakeModel::placeTeleport()
-{
-    int maxPos = 400 / blockSize;
-
-    for (auto& obj : gameObjects) {
-        if (auto teleport = dynamic_cast<Teleport*>(obj.get())) {
+        if (obj->getType() == type && ((obj->getIndex() == index) || checkTeleports(index, obj->getIndex()))) {
 
             QPoint teleportPosition;
             do {
@@ -177,10 +158,14 @@ void SnakeModel::placeTeleport()
                 teleportPosition.setY(QRandomGenerator::global()->bounded(maxPos));
             } while (isPositionOccupied(teleportPosition));
 
-            teleport->setPosition(teleportPosition);
+            obj->setPosition(teleportPosition);
         }
     }
 }
+
+
+
+
 
 void SnakeModel::growSnake()
 {
@@ -264,6 +249,15 @@ void SnakeModel::SetGameStatus()
         timer->stop();
     }else {
         timer->start(100);
+    }
+}
+
+bool SnakeModel::checkTeleports(int ind1, int ind2)
+{
+    if ((((ind1 + ind2) % 4 == 1 ) && ((ind1 - ind2 == 1) || (ind2 - ind1 == 1)))) {
+        return true;
+    } else {
+        return false;
     }
 }
 

@@ -12,12 +12,24 @@ public:
     Food();
     QPoint getPosition() const override;
     void setPosition(const QPoint& pos) override;
+    int getIndex() const override {
+        return index;
+    }
+    void setIndex(const int& ind) override {
+        index = ind;
+    }
+
     void accept(GameObjectVisitor& visitor) override {
         visitor.visit(*this);
     }
 
+    std::string getType() const override {
+        return "Food";
+    }
+
 private:
     QPoint position;
+    int index;
 };
 
 #endif // FOOD_H
